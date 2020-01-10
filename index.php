@@ -1,3 +1,32 @@
+<?php
+include 'connection.php';
+session_start();
+if(isset($_SESSION['username']))
+{
+	header('location:dashboard.php');
+}
+if(isset($_POST['button']))
+{
+	$username=$_POST['username'];
+	$password=$_POST['password'];
+	$result=mysqli_query($con,"SELECT  *
+	FROM `registration_table` WHERE  username ='$username'AND password ='$password'");
+	if(mysqli_num_rows($result)==1)
+	{
+		$row_data= mysqli_fetch_assoc($result);
+		$_SESSION['username']=$row_data['login_id'];
+		header('location:dashboard.php');
+    }
+    else
+	{
+        echo" <script> alert('you have entered incorrect password or username' );
+       
+        </script>";
+    }
+
+
+}
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -30,7 +59,9 @@
 
       <form method="post">
         <div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="username">
+           
+        <input type="text" class="form-control" id="username" name="username" placeholder="username">
+            <span id="unameerror" style="color: red"></span><br>
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-user"></span>
@@ -38,7 +69,10 @@
           </div>
         </div>
         <div class="input-group mb-3">
-          <input type="password" class="form-control" placeholder="Password">
+          
+          <input type="password" class="form-control" id="password" name="password"
+          placeholder="Password">
+          <span id="passworderror" style="color: red"></span><br>
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-lock"></span>
@@ -56,7 +90,7 @@
           </div>
           <!-- /.col -->
           <div class="col-4">
-            <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+            <button type="submit"  name="button"class="btn btn-primary btn-block" onclick="return valid();">Sign In</button>
           </div>
           <!-- /.col -->
         </div>
@@ -84,3 +118,47 @@
 
 </body>
 </html>
+
+
+<script type="text/javascript">
+  function valid()
+  {
+    var username=document.getElementById('username').value;
+    var password=document.getElementById('password').value;
+    if (username=="")
+{
+  document.getElementById('unameerror').innerHTML="username required";
+  return false;
+}
+if (password=="")
+{
+  document.getElementById('passworderror').innerHTML="password required";
+  return false;
+}
+
+
+  }
+</script>
+
+
+<?php
+include'connection.php';
+
+
+if (isset($_POST['submit'])) 
+{
+  $username=$_POST['username'];
+  $password=$_POST['password'];
+  $result=mysqli_query($con,"SELECT `Username`, `Password` FROM `registration_table` WHERE username='$username'AND password='$password'");
+  if(mysqli_num_rows($result)==1)
+  {
+    header('location:dashboard.php');
+  }
+  else
+  {
+    echo "<script> alert(you entered incorrect password);</script>";
+    exit();
+  }
+
+}
+  ?>
